@@ -1,4 +1,4 @@
-# --- Default character patterns (9x7) ---
+# --- Default character patterns (10x7) ---
 default_char_patterns = {
     "0": [
         [0, 0, 1, 1, 1, 1, 0],
