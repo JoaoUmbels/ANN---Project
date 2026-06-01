@@ -3,9 +3,6 @@ from tkinter import ttk, messagebox
 import numpy as np
 
 
-olá
-effsfsfsfesfe
-
 def bipolarize(arr):
     return np.array(arr) * 2 - 1
 
