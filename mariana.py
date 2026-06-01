@@ -107,8 +107,7 @@ class ANNapp:
         tk.Button(controls, text="Save as Example", command=self.save_example).pack(fill="x", pady=2)
         tk.Button(controls, text="Clear Drawing", command=self.clear_drawing).pack(fill="x", pady=2)
 
-        self.status_label = tk.Label(controls, text="Train a model to start.", fg="blue", wraplength=150)
-        self.status_label.pack(pady=5)
+
 
         self.result_label = tk.Label(controls, text="")
         self.result_label.pack()
