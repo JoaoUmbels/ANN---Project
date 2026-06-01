@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import numpy as np
-
+from Settings import default_char_patterns
 
 def bipolarize(arr):
     return np.array(arr) * 2 - 1
