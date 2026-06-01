@@ -1,6 +1,6 @@
 #  Default number patterns (7x10)  binary grid 
 # '1' = pixel on and '0' = pixel off
-default_char_patterns = {
+numbers_set = {
     "0": [
         [0,0,1,1,1,1,0],
         [0,1,0,0,0,0,1],
