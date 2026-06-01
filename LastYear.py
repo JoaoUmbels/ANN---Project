@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import numpy as np
-from Settings import default_char_patterns
+from Settings import numbers_set
 
 def bipolarize(arr):
     return np.array(arr) * 2 - 1
@@ -54,10 +54,10 @@ class ANNClassifierApp:
         self.root = root
         root.title("ANN Character Classifier")
 
-        self.rows, self.cols = 9, 7
+        self.rows, self.cols = 10, 7
         self.cell_size = 40
 
-        self.char_patterns = default_char_patterns.copy()
+        self.char_patterns = numbers_set.copy()
         self.patterns = {k: bipolarize(v).flatten() for k, v in self.char_patterns.items()}
         self.X = list(self.patterns.values())
         self.y_labels = list(self.patterns.keys())
