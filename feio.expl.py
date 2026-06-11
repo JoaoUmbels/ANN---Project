@@ -218,29 +218,34 @@ class ANNApp: # classe principal que cria a interface gráfica
 
 
 if __name__ == "__main__":
+    
     print("""
 ══════════════════════════════════════════════════════════════
-          ANN NUMBERS' CLASSIFIER
-    Hebb  ·  Perceptron  ·  Adaline (Delta Rule)
+                ANN NUMBERS' CLASSIFIER
 ══════════════════════════════════════════════════════════════
-Supported digits : 0 – 7
-Grid size        : 10 rows × 7 cols = 70 inputs
 
-HOW TO USE:
-  1. Select an algorithm (radio buttons).
-  2. Click "Train Algorithm".
-  3. Draw a digit on the canvas (click or drag).
-  4. Click "Classify Drawing" to get the prediction.
-  5. Use "Load →" to test with a stored prototype.
-  6. Use "Save as Example" to add your drawing to the
-     training set, then retrain.
+Supported Numbers
+──────────────────────
+0, 1, 2, 3, 4, 5, 6, 7
 
-ALGORITHM NOTES:
-  Hebb      — no learning rate, trains in one pass.
-  Perceptron— lr=0.2, epochs=200 recommended.
-  Adaline   — lr is auto-capped at 0.005 for stability.
+Learning Algorithms
+──────────────────────
+- Adaline
+- Hebb
+- Perceptron
+
+Instructions
+─────────────────────────────────────────────────────────────
+1. Open the drawing canvas.
+2. Select and train an algorithm.
+3. Draw one of the supported numbers.
+4. Click "Classify Drawing" to get a prediction.
+5. Select a number and click "Save as Example".
+6. Use "Clear" to erase the canvas and try again.
 ══════════════════════════════════════════════════════════════
 """)
+    input("Press ENTER to open the drawing window...")
+    launch_gui()
     root = tk.Tk() # cria a janela principal
     app = ANNApp(root) # inicia a aplicação
     root.mainloop() # mantém a janela aberta
