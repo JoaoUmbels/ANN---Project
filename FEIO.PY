@@ -14,12 +14,12 @@ class Hebb:
         self.b = None
 
     def train(self, X, y_idx):
-        n_classes = len(set(y_idx))
+        n_numbers = len(set(y_idx))
         n_inputs = len(X[0])
-        self.W = np.zeros((n_classes, n_inputs))
-        self.b = np.zeros(n_classes)
+        self.W = np.zeros((n_numbers, n_inputs))
+        self.b = np.zeros(n_numbers)
         for xi, target in zip(X, y_idx):
-            for i in range(n_classes):
+            for i in range(n_numbers):
                 desired = 1 if i == target else -1
                 self.W[i] += desired * xi
                 self.b[i] += desired
@@ -36,13 +36,13 @@ class Perceptron:
         self.lr = lr
 
     def train(self, X, y_idx, epochs=100):
-        n_classes = len(set(y_idx))
+        n_numbers = len(set(y_idx))
         n_inputs = len(X[0])
-        self.W = np.zeros((n_classes, n_inputs))
-        self.b = np.zeros(n_classes)
+        self.W = np.zeros((n_numbers, n_inputs))
+        self.b = np.zeros(n_numbers)
         for _ in range(epochs):
             for xi, target in zip(X, y_idx):
-                for i in range(n_classes):
+                for i in range(n_numbers):
                     out = np.sign(np.dot(self.W[i], xi) + self.b[i])
                     desired = 1 if i == target else -1
                     error = desired - out
@@ -61,13 +61,13 @@ class Adaline:
         self.lr = lr
 
     def train(self, X, y_idx, epochs=200):
-        n_classes = len(set(y_idx))
+        n_numbers = len(set(y_idx))
         n_inputs = len(X[0])
-        self.W = np.zeros((n_classes, n_inputs))
-        self.b = np.zeros(n_classes)
+        self.W = np.zeros((n_numbers, n_inputs))
+        self.b = np.zeros(n_numbers)
         for _ in range(epochs):
             for xi, target in zip(X, y_idx):
-                desired = np.full(n_classes, -1.0)
+                desired = np.full(n_numbers, -1.0)
                 desired[target] = 1.0
                 net = np.dot(self.W, xi) + self.b
                 error = desired - net
@@ -218,29 +218,35 @@ class ANNApp:
 
 
 if __name__ == "__main__":
+    
     print("""
 ══════════════════════════════════════════════════════════════
-          ANN NUMBERS' CLASSIFIER
-    Hebb  ·  Perceptron  ·  Adaline (Delta Rule)
+                ANN NUMBERS' CLASSIFIER
 ══════════════════════════════════════════════════════════════
-Supported digits : 0 – 7
-Grid size        : 10 rows × 7 cols = 70 inputs
 
-HOW TO USE:
-  1. Select an algorithm (radio buttons).
-  2. Click "Train Algorithm".
-  3. Draw a digit on the canvas (click or drag).
-  4. Click "Classify Drawing" to get the prediction.
-  5. Use "Load →" to test with a stored prototype.
-  6. Use "Save as Example" to add your drawing to the
-     training set, then retrain.
+Supported Numbers
+──────────────────────
+0, 1, 2, 3, 4, 5, 6, 7
 
-ALGORITHM NOTES:
-  Hebb      — no learning rate, trains in one pass.
-  Perceptron— lr=0.2, epochs=200 recommended.
-  Adaline   — lr is auto-capped at 0.005 for stability.
+Learning Algorithms
+──────────────────────
+- Adaline
+- Hebb
+- Perceptron
+
+Instructions
+─────────────────────────────────────────────────────────────
+1. Open the drawing canvas.
+2. Select and train an algorithm.
+3. Draw one of the supported numbers.
+4. Click "Classify Drawing" to get a prediction.
+5. Select a number and click "Save as Example".
+6. Use "Clear" to erase the canvas and try again.
 ══════════════════════════════════════════════════════════════
 """)
+    input("Press ENTER to open the drawing window...")
+    
+    
     root = tk.Tk()
     app = ANNApp(root)
     root.mainloop()
