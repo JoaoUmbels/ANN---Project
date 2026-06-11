@@ -76,7 +76,8 @@ class Adaline: # classe do algoritmo Adaline (regra delta)
             for xi, target in zip(X, y_idx): # para cada padrão
                 desired = np.full(n_numbers, -1.0) # vetor com -1 em todas as classes
                 desired[target] = 1.0 # coloca +1 na classe correta
-                net = np.dot(self.W, xi) + self.b # calcula a saída linear (sem função sinal)
+                #cria uma lista com 8 posições cheia de -1. Depois, vai direto à posição do número correto (target) e muda-a para 1
+                net = np.dot(self.W, xi) + self.b # calcula a saída linear (sem função sinal), guarda o numero exato. net=Y_in 
                 error = desired - net # erro = valor esperado - valor calculado
                 self.W += self.lr * np.outer(error, xi) # atualiza pesos com a regra delta
                 self.b += self.lr * error # atualiza bias
