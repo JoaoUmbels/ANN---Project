@@ -66,7 +66,6 @@ class ANNapp:
         self.perceptron = None
         self.adaline = None
         self.current_model_name = None
-        # ADICIONAR AQUI UM DPS P O HEBB
 
         self.canvas = tk.Canvas(root, width=self.cols * self.cell_size, height=self.rows * self.cell_size, bg="white")
         self.canvas.grid(row=0, column=1, padx=10, pady=10)
@@ -107,10 +106,11 @@ class ANNapp:
         tk.Button(controls, text="Save as Example", command=self.save_example).pack(fill="x", pady=2)
         tk.Button(controls, text="Clear Drawing", command=self.clear_drawing).pack(fill="x", pady=2)
 
-
-
         self.result_label = tk.Label(controls, text="")
         self.result_label.pack()
+
+        self.status_label = tk.Label(controls, text="", fg="gray")
+        self.status_label.pack()
 
     def on_canvas_click(self, event):
         col = event.x // self.cell_size
@@ -176,8 +176,7 @@ if __name__ == "__main__":
         app = ANNapp(root)
         root.mainloop()
 
-    if __name__ == "__main__":
-        print("""
+    print("""
 ══════════════════════════════════════════════════════════════
                 ANN NUMBERS' CLASSIFIER
 ══════════════════════════════════════════════════════════════
@@ -188,9 +187,9 @@ Supported Numbers
 
 Learning Algorithms
 ──────────────────────
-• Adaline
-• Hebb
-• Perceptron
+- Adaline
+- Hebb
+- Perceptron
 
 Instructions
 ─────────────────────────────────────────────────────────────
@@ -202,5 +201,5 @@ Instructions
 6. Use "Clear" to erase the canvas and try again.
 ══════════════════════════════════════════════════════════════
 """)
-        input("Press ENTER to open the drawing window...")
-        launch_gui()
+    input("Press ENTER to open the drawing window...")
+    launch_gui()
