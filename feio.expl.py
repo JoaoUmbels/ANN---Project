@@ -16,11 +16,14 @@ class Hebb: # classe do algoritmo de Hebb
     def train(self, X, y_idx): # treina a rede com os padrões
         n_numbers = len(set(y_idx)) # conta quantas classes existem (8 números)
         n_inputs = len(X[0]) # conta quantos pixels tem cada padrão (70)
+        #cria um "quadro Branco"
         self.W = np.zeros((n_numbers, n_inputs)) # cria a matriz de pesos com zeros
         self.b = np.zeros(n_numbers) # cria o vetor de bias com zeros
+        #Para cada desenho (xi) e para o seu número real correspondente (target), 
+        #ele vai obrigar os 8 neurónios da saída a olhar para esse desenho.
         for xi, target in zip(X, y_idx): # para cada padrão e o seu número correto
             for i in range(n_numbers): # para cada classe (0 a 7)
-                desired = 1 if i == target else -1 # valor esperado: +1 se for a classe certa, -1 se não
+                desired = 1 if i == target else -1 #+1 caso seja o número, -1 se for outro número
                 self.W[i] += desired * xi # atualiza os pesos: regra de Hebb (W = W + g * f)
                 self.b[i] += desired # atualiza o bias da mesma forma
 
@@ -28,6 +31,8 @@ class Hebb: # classe do algoritmo de Hebb
         outputs = np.dot(self.W, x) + self.b # calcula a ativação de cada neurónio de saída
         return np.argmax(outputs) # devolve o índice do neurónio mais ativado (o número reconhecido)
 
+#Pode falhar pq Se o teu número "1" partilhar muitos pixels parecidos com o
+#teu número "7", a matriz de pesos vai ficar baralhada (haverá muita sobreposição de memória).
 
 class Perceptron: # classe do algoritmo Perceptron
     def __init__(self, lr=0.2): # inicializa com learning rate 0.2 por defeito
@@ -35,7 +40,7 @@ class Perceptron: # classe do algoritmo Perceptron
         self.b = None
         self.lr = lr # guarda o learning rate
 
-    def train(self, X, y_idx, epochs=100): # treina durante 100 épocas
+    def train(self, X, y_idx, epochs=100): # treina durante 100 épocas (vezes)
         n_numbers = len(set(y_idx)) # número de classes
         n_inputs = len(X[0]) # número de inputs (pixels)
         self.W = np.zeros((n_numbers, n_inputs)) # pesos começam a zero
@@ -43,9 +48,11 @@ class Perceptron: # classe do algoritmo Perceptron
         for _ in range(epochs): # repete o treino durante o número de épocas definido
             for xi, target in zip(X, y_idx): # para cada padrão de treino
                 for i in range(n_numbers): # para cada classe
-                    out = np.sign(np.dot(self.W[i], xi) + self.b[i]) # calcula a saída com função sinal (+1 ou -1)
+                    out = np.sign(np.dot(self.W[i], xi) + self.b[i]) #y_in= np.dot(self.W[i], xi) + self.b[i], 
+                                                                     #y_out = np.sign(y_in), (1(ativo) ou -1(inativo))
                     desired = 1 if i == target else -1 # valor esperado
-                    error = desired - out # calcula o erro
+                    error = desired - out # erro, caso a rede tenha acertado -1 no lugar de -1 ou 1 no lugar de 1, erro=0, 
+                                          # caso contrário, Devia dar 1 e a rede disse -1: e=2. Devia dar -1 e a rede disse 1: e=-2.  
                     self.W[i] += self.lr * error * xi # atualiza os pesos só se houver erro
                     self.b[i] += self.lr * error # atualiza o bias só se houver erro
 
