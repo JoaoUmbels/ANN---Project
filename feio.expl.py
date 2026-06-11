@@ -14,12 +14,12 @@ class Hebb: # classe do algoritmo de Hebb
         self.b = None
 
     def train(self, X, y_idx): # treina a rede com os padrões
-        n_classes = len(set(y_idx)) # conta quantas classes existem (8 números)
+        n_numbers = len(set(y_idx)) # conta quantas classes existem (8 números)
         n_inputs = len(X[0]) # conta quantos pixels tem cada padrão (70)
-        self.W = np.zeros((n_classes, n_inputs)) # cria a matriz de pesos com zeros
-        self.b = np.zeros(n_classes) # cria o vetor de bias com zeros
+        self.W = np.zeros((n_numbers, n_inputs)) # cria a matriz de pesos com zeros
+        self.b = np.zeros(n_numbers) # cria o vetor de bias com zeros
         for xi, target in zip(X, y_idx): # para cada padrão e o seu número correto
-            for i in range(n_classes): # para cada classe (0 a 7)
+            for i in range(n_numbers): # para cada classe (0 a 7)
                 desired = 1 if i == target else -1 # valor esperado: +1 se for a classe certa, -1 se não
                 self.W[i] += desired * xi # atualiza os pesos: regra de Hebb (W = W + g * f)
                 self.b[i] += desired # atualiza o bias da mesma forma
@@ -36,13 +36,13 @@ class Perceptron: # classe do algoritmo Perceptron
         self.lr = lr # guarda o learning rate
 
     def train(self, X, y_idx, epochs=100): # treina durante 100 épocas
-        n_classes = len(set(y_idx)) # número de classes
+        n_numbers = len(set(y_idx)) # número de classes
         n_inputs = len(X[0]) # número de inputs (pixels)
-        self.W = np.zeros((n_classes, n_inputs)) # pesos começam a zero
-        self.b = np.zeros(n_classes) # bias começa a zero
+        self.W = np.zeros((n_numbers, n_inputs)) # pesos começam a zero
+        self.b = np.zeros(n_numbers) # bias começa a zero
         for _ in range(epochs): # repete o treino durante o número de épocas definido
             for xi, target in zip(X, y_idx): # para cada padrão de treino
-                for i in range(n_classes): # para cada classe
+                for i in range(n_numbers): # para cada classe
                     out = np.sign(np.dot(self.W[i], xi) + self.b[i]) # calcula a saída com função sinal (+1 ou -1)
                     desired = 1 if i == target else -1 # valor esperado
                     error = desired - out # calcula o erro
@@ -61,13 +61,13 @@ class Adaline: # classe do algoritmo Adaline (regra delta)
         self.lr = lr
 
     def train(self, X, y_idx, epochs=200): # treina durante 200 épocas
-        n_classes = len(set(y_idx))
+        n_numbers = len(set(y_idx))
         n_inputs = len(X[0])
-        self.W = np.zeros((n_classes, n_inputs)) # pesos a zero
-        self.b = np.zeros(n_classes) # bias a zero
+        self.W = np.zeros((n_numbers, n_inputs)) # pesos a zero
+        self.b = np.zeros(n_numbers) # bias a zero
         for _ in range(epochs): # repete por todas as épocas
             for xi, target in zip(X, y_idx): # para cada padrão
-                desired = np.full(n_classes, -1.0) # vetor com -1 em todas as classes
+                desired = np.full(n_numbers, -1.0) # vetor com -1 em todas as classes
                 desired[target] = 1.0 # coloca +1 na classe correta
                 net = np.dot(self.W, xi) + self.b # calcula a saída linear (sem função sinal)
                 error = desired - net # erro = valor esperado - valor calculado
@@ -245,7 +245,8 @@ Instructions
 ══════════════════════════════════════════════════════════════
 """)
     input("Press ENTER to open the drawing window...")
-    launch_gui()
+    
+    
     root = tk.Tk() # cria a janela principal
     app = ANNApp(root) # inicia a aplicação
     root.mainloop() # mantém a janela aberta
