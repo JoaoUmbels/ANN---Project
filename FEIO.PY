@@ -244,7 +244,7 @@ Instructions
 6. Use "Clear" to erase the canvas and try again.
 ══════════════════════════════════════════════════════════════
 """)
-    input("Press ENTER to open the drawing window...")
+
     
     
     root = tk.Tk()
