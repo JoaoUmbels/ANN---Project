@@ -31,6 +31,7 @@ class Hebb: # classe do algoritmo de Hebb
                 self.W[i] += desired * xi # atualiza os pesos: regra de Hebb (W = W + g * f)
                 self.b[i] += desired # atualiza o bias da mesma forma
 
+        for xi, target in zip(X, y_idx):
             if self.predict(xi) == target:
                 total_correct += 1
             else:
@@ -43,11 +44,16 @@ class Hebb: # classe do algoritmo de Hebb
             "time":  final_t - start_t,
             "correct": total_correct,
             "wrong": total_error,
-            "accuracy": accuracy
+            "accuracy": accuracy,
+            "epochs": "----",
+            "iterations": "----",
+            "mse": "----"
             }
 
     def predict(self, x): # classifica um padrão desenhado
         outputs = np.dot(self.W, x) + self.b # calcula a ativação de cada neurónio de saída
+        if np.max(outputs) < 0: # se nenhuma classe tiver ativação positiva
+            return -1
         return np.argmax(outputs) # devolve o índice do neurónio mais ativado (o número reconhecido)
 
 #Pode falhar pq Se o teu número "1" partilhar muitos pixels parecidos com o
@@ -67,25 +73,31 @@ class Perceptron: # classe do algoritmo Perceptron
         n_inputs = len(X[0]) # número de inputs (pixels)
         self.W = np.zeros((n_numbers, n_inputs)) # pesos começam a zero
         self.b = np.zeros(n_numbers) # bias começa a zero
+        epochs_run = 0
         for _ in range(epochs): # repete o treino durante o número de épocas definido
+            epochs_run += 1
+            has_error = False # check for early stopping
             for xi, target in zip(X, y_idx): # para cada padrão de treino
-                print(target)
                 for i in range(n_numbers): # para cada classe
                     out = np.sign(np.dot(self.W[i], xi) + self.b[i]) #y_in= np.dot(self.W[i], xi) + self.b[i], 
                                                                      #y_out = np.sign(y_in), (1(ativo) ou -1(inativo))
                     desired = 1 if i == target else -1 # valor esperado
 
-                    print(desired)
-
                     error = desired - out # erro, caso a rede tenha acertado -1 no lugar de -1 ou 1 no lugar de 1, erro=0, 
                                           # caso contrário, Devia dar 1 e a rede disse -1: e=2. Devia dar -1 e a rede disse 1: e=-2.  
-                    self.W[i] += self.lr * error * xi # atualiza os pesos só se houver erro
-                    self.b[i] += self.lr * error # atualiza o bias só se houver erro
+                    if error != 0:
+                        self.W[i] += self.lr * error * xi # atualiza os pesos só se houver erro
+                        self.b[i] += self.lr * error # atualiza o bias só se houver erro
+                        has_error = True
 
-                if self.predict(xi) == target:
-                    total_correct += 1
-                else:
-                    total_error += 1
+            if not has_error:
+                break # early stopping se não houver erros na época
+
+        for xi, target in zip(X, y_idx):
+            if self.predict(xi) == target:
+                total_correct += 1
+            else:
+                total_error += 1
 
         final_t = time.time()
         accuracy = total_correct/len(X)
@@ -93,11 +105,16 @@ class Perceptron: # classe do algoritmo Perceptron
             "time":  final_t - start_t,
             "correct": total_correct,
             "wrong": total_error,
-            "accuracy": accuracy
+            "accuracy": accuracy,
+            "epochs": "----",
+            "iterations": epochs_run,
+            "mse": "----"
             }
     
     def predict(self, x): # classifica um padrão
         outputs = np.dot(self.W, x) + self.b # calcula a ativação de cada neurónio
+        if np.max(outputs) < 0:
+            return -1
         return np.argmax(outputs) # devolve o número com maior ativação
 
 
@@ -115,15 +132,26 @@ class Adaline: # classe do algoritmo Adaline (regra delta)
         n_inputs = len(X[0])
         self.W = np.zeros((n_numbers, n_inputs)) # pesos a zero
         self.b = np.zeros(n_numbers) # bias a zero
+        final_mse = 0
         for _ in range(epochs): # repete por todas as épocas
+            W_gradient = np.zeros_like(self.W)
+            b_gradient = np.zeros_like(self.b)
+            epoch_mse = 0
+
             for xi, target in zip(X, y_idx): # para cada padrão
                 desired = np.full(n_numbers, -1.0) # vetor com -1 em todas as classes
                 desired[target] = 1.0 # coloca +1 na classe correta
                 #cria uma lista com 8 posições cheia de -1. Depois, vai direto à posição do número correto (target) e muda-a para 1
                 net = np.dot(self.W, xi) + self.b # calcula a saída linear (sem função sinal), guarda o numero exato. net=Y_in 
                 error = desired - net # erro = valor esperado - valor calculado
-                self.W += self.lr * np.outer(error, xi) # atualiza pesos com a regra delta
-                self.b += self.lr * error # atualiza bias
+                epoch_mse += np.sum(error ** 2)
+                W_gradient += np.outer(error, xi) # acumula o erro para os pesos
+                b_gradient += error # acumula o erro para o bias
+            
+            final_mse = epoch_mse / (len(X) * n_numbers)
+            # atualiza os pesos uma vez por época (Batch Learning)
+            self.W += self.lr * W_gradient
+            self.b += self.lr * b_gradient
                 
 
         for xi, target in zip(X, y_idx):
@@ -139,11 +167,16 @@ class Adaline: # classe do algoritmo Adaline (regra delta)
         "time":  final_t - start_t,
         "correct": total_correct,
         "wrong": total_error,
-        "accuracy": accuracy
+        "accuracy": accuracy,
+        "epochs": epochs,
+        "iterations": "----",
+        "mse": final_mse
         }
 
     def predict(self, x): # classifica um padrão
         outputs = np.dot(self.W, x) + self.b # calcula a ativação linear
+        if np.max(outputs) < 0:
+            return -1
         return np.argmax(outputs) # devolve o número mais provável
 
 
@@ -172,6 +205,9 @@ class ANNApp: # classe principal que cria a interface gráfica
                                 height=self.rows * self.cell_size, bg="white") # cria a área de desenho
         self.canvas.grid(row=0, column=1, padx=10, pady=10) # coloca o canvas na janela
         self.canvas.bind("<Button-1>", self.on_click) # liga o clique do rato à função on_click
+        self.canvas.bind("<B1-Motion>", self.on_drag) # liga o arrastar do rato (desenhar)
+        self.canvas.bind("<B2-Motion>", self.on_erase_drag) # botão direito/meio para apagar (Mac/PC)
+        self.canvas.bind("<B3-Motion>", self.on_erase_drag) # botão direito para apagar
 
         self.rects = [] # lista para guardar todos os retângulos da grelha
         for r in range(self.rows): # para cada linha
@@ -192,19 +228,24 @@ class ANNApp: # classe principal que cria a interface gráfica
 
         tk.Label(controls, text="Algorithm").pack(anchor="w") # etiqueta "Algorithm"
         self.model_var = tk.StringVar(value="Perceptron") # variável que guarda o algoritmo selecionado
-        ttk.Combobox(controls, textvariable=self.model_var,
+        self.algo_combo = ttk.Combobox(controls, textvariable=self.model_var,
                      values=["Hebb", "Perceptron", "Adaline"],
-                     state="readonly", width=18).pack() # menu dropdown para escolher o algoritmo
-        
-        if self.model_var == "Adaline":
-            tk.Label(controls, text="Epochs").pack(anchor="w")
-            self.epochs = tk.StringVar(value="100")
-            tk.Entry(controls, textvariable=self.epochs, width=10).pack()
-    
+                     state="readonly", width=18)
+        self.algo_combo.pack() # menu dropdown para escolher o algoritmo
+        self.algo_combo.bind("<<ComboboxSelected>>", self.update_ui_visibility)
 
-        tk.Label(controls, text="Learning Rate").pack(anchor="w") # etiqueta "Learning Rate"
+        self.hyperparams_frame = tk.Frame(controls)
+        self.hyperparams_frame.pack(fill="x")
+
+        self.epochs_frame = tk.Frame(self.hyperparams_frame)
+        tk.Label(self.epochs_frame, text="Epochs").pack(anchor="w")
+        self.epochs = tk.StringVar(value="100")
+        tk.Entry(self.epochs_frame, textvariable=self.epochs, width=10).pack()
+
+        self.lr_frame = tk.Frame(self.hyperparams_frame)
+        tk.Label(self.lr_frame, text="Learning Rate").pack(anchor="w") # etiqueta "Learning Rate"
         self.lr_var = tk.StringVar(value="0.2") # valor por defeito do learning rate
-        tk.Entry(controls, textvariable=self.lr_var, width=10).pack() # caixa de texto para o learning rate
+        tk.Entry(self.lr_frame, textvariable=self.lr_var, width=10).pack() # caixa de texto para o learning rate
 
         tk.Label(controls, text="Number Label").pack(anchor="w") # etiqueta para escolher o número a guardar
         self.save_label_var = tk.StringVar(value=self.y_labels[0]) # número selecionado por defeito
@@ -214,6 +255,7 @@ class ANNApp: # classe principal que cria a interface gráfica
         tk.Button(controls, text="Train Model", command=self.train_model).pack(fill="x", pady=2) # botão para treinar
         tk.Button(controls, text="Classify Drawing", command=self.classify_drawing).pack(fill="x", pady=2) # botão para classificar
         tk.Button(controls, text="Save as Example", command=self.save_example).pack(fill="x", pady=2) # botão para guardar exemplo
+        tk.Button(controls, text="Visualize Weights", command=self.visualize_weights).pack(fill="x", pady=2) # botão para heatmap
         tk.Button(controls, text="Clear Drawing", command=self.clear_drawing).pack(fill="x", pady=2) # botão para limpar a grelha
 
         tk.Button(root, text="📊 View Performance Dashboard", command=self.show_dashboard, bg="#d1ecf1").grid(row=3, column=0, columnspan=3, sticky="ew", padx=5, pady=5)
@@ -224,10 +266,28 @@ class ANNApp: # classe principal que cria a interface gráfica
         self.status_label.pack()
 
         self.performance_history = {
-            "Hebb": {"time": "N/A", "correct": "N/A", "wrong": "N/A", "accuracy": "N/A"},
-            "Perceptron": {"time": "N/A", "correct": "N/A", "wrong": "N/A", "accuracy": "N/A"},
-            "Adaline": {"time": "N/A", "correct": "N/A", "wrong": "N/A", "accuracy": "N/A"}
+            "Hebb": {"time": "N/A", "correct": "N/A", "wrong": "N/A", "accuracy": "N/A", "epochs": "----", "iterations": "----", "mse": "----"},
+            "Perceptron": {"time": "N/A", "correct": "N/A", "wrong": "N/A", "accuracy": "N/A", "epochs": "----", "iterations": "----", "mse": "----"},
+            "Adaline": {"time": "N/A", "correct": "N/A", "wrong": "N/A", "accuracy": "N/A", "epochs": "----", "iterations": "----", "mse": "----"}
         }
+
+        self.update_ui_visibility()
+
+    def update_ui_visibility(self, event=None):
+        algo = self.model_var.get()
+        
+        self.epochs_frame.pack_forget()
+        self.lr_frame.pack_forget()
+        
+        if algo == "Adaline":
+            self.epochs_frame.pack(fill="x")
+            self.lr_frame.pack(fill="x")
+            if self.lr_var.get() == "0.2":
+                self.lr_var.set("0.001")
+        elif algo == "Perceptron":
+            self.lr_frame.pack(fill="x")
+            if self.lr_var.get() == "0.001":
+                self.lr_var.set("0.2")
 
     def on_click(self, event): # função chamada quando o utilizador clica na grelha
         col = event.x // self.cell_size # calcula em que coluna foi o clique
@@ -236,6 +296,20 @@ class ANNApp: # classe principal que cria a interface gráfica
             self.grid_state[row, col] = 1 - self.grid_state[row, col] # inverte o estado da célula (0 vira 1 e 1 vira 0)
             color = "black" if self.grid_state[row, col] else "white" # escolhe a cor
             self.canvas.itemconfig(self.rects[row][col], fill=color) # pinta a célula
+
+    def on_drag(self, event):
+        col = event.x // self.cell_size
+        row = event.y // self.cell_size
+        if 0 <= row < self.rows and 0 <= col < self.cols:
+            self.grid_state[row, col] = 1 # desenha
+            self.canvas.itemconfig(self.rects[row][col], fill="black")
+
+    def on_erase_drag(self, event):
+        col = event.x // self.cell_size
+        row = event.y // self.cell_size
+        if 0 <= row < self.rows and 0 <= col < self.cols:
+            self.grid_state[row, col] = 0 # apaga
+            self.canvas.itemconfig(self.rects[row][col], fill="white")
 
     def clear_drawing(self): # função para limpar a grelha
         self.grid_state.fill(0) # coloca todos os valores a zero
@@ -246,13 +320,15 @@ class ANNApp: # classe principal que cria a interface gráfica
         self.status_label.config(text="Drawing cleared.") # mostra mensagem
 
     def train_model(self): # função chamada quando se clica em "Train Model"
-        try:
-            lr = float(self.lr_var.get()) # lê o learning rate introduzido pelo utilizador
-        except ValueError:
-            messagebox.showerror("Invalid input", "Learning rate must be a number.") # erro se não for número
-            return
-
         name = self.model_var.get() # lê o algoritmo selecionado
+
+        lr = 0.2
+        if name in ["Perceptron", "Adaline"]:
+            try:
+                lr = float(self.lr_var.get()) # lê o learning rate introduzido pelo utilizador
+            except ValueError:
+                messagebox.showerror("Invalid input", "Learning rate must be a number.") # erro se não for número
+                return
         self.status_label.config(text=f"Training {name}...", fg="gray") # mostra que está a treinar
         self.root.update() # atualiza a janela para mostrar a mensagem
 
@@ -264,13 +340,19 @@ class ANNApp: # classe principal que cria a interface gráfica
 
         elif name == "Perceptron": # se o algoritmo for Perceptron
             self.perceptron = Perceptron(lr) # cria um novo Perceptron com o learning rate dado
-            statistics = self.perceptron.train(self.X, self.y_idx, int(self.epochs.get())) # treina durante 100 épocas
+            statistics = self.perceptron.train(self.X, self.y_idx) # treina durante 100 épocas
             self.current_model = "Perceptron"
             self.performance_history["Perceptron"] = statistics
 
         else: # se o algoritmo for Adaline
             self.adaline = Adaline(lr) # cria um novo Adaline
-            statistics = self.adaline.train(self.X, self.y_idx, int(self.epochs.get())) # treina durante 200 épocas
+            try:
+                ep = int(self.epochs.get())
+            except ValueError:
+                messagebox.showerror("Invalid input", "Epochs must be an integer.")
+                self.status_label.config(text="Training failed.", fg="red")
+                return
+            statistics = self.adaline.train(self.X, self.y_idx, ep) # treina durante as épocas
             self.current_model = "Adaline"
             self.performance_history["Adaline"] = statistics
 
@@ -290,7 +372,56 @@ class ANNApp: # classe principal que cria a interface gráfica
         else:
             pred = self.adaline.predict(x)
 
-        self.result_label.config(text=f"Recognized: {self.y_labels[pred]}") # mostra o número reconhecido
+        if pred == -1:
+            self.result_label.config(text="Recognized: Unknown")
+        else:
+            self.result_label.config(text=f"Recognized: {self.y_labels[pred]}") # mostra o número reconhecido
+
+    def visualize_weights(self):
+        if self.current_model is None:
+            messagebox.showwarning("No model", "Please train a model first.")
+            return
+        
+        label = self.save_label_var.get()
+        if label not in self.y_labels:
+            messagebox.showerror("Error", f"Label '{label}' not found.")
+            return
+            
+        idx = self.y_labels.index(label)
+        
+        if self.current_model == "Hebb":
+            W = self.hebb.W[idx]
+        elif self.current_model == "Perceptron":
+            W = self.perceptron.W[idx]
+        else:
+            W = self.adaline.W[idx]
+            
+        W_grid = W.reshape((self.rows, self.cols))
+        
+        vis_win = tk.Toplevel(self.root)
+        vis_win.title(f"Weights Heatmap for '{label}' ({self.current_model})")
+        
+        canvas = tk.Canvas(vis_win, width=self.cols * 40, height=self.rows * 40, bg="white")
+        canvas.pack(padx=20, pady=20)
+        
+        max_w = np.max(np.abs(W_grid))
+        if max_w == 0: max_w = 1 # evita divisão por zero
+        
+        for r in range(self.rows):
+            for c in range(self.cols):
+                val = W_grid[r, c]
+                intensity = int((abs(val) / max_w) * 255)
+                if val > 0:
+                    color = f"#00{intensity:02x}00" # Verde para positivo
+                else:
+                    color = f"#{intensity:02x}0000" # Vermelho para negativo
+                    
+                x1, y1 = c * 40, r * 40
+                x2, y2 = x1 + 40, y1 + 40
+                canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="black")
+                
+        tk.Label(vis_win, text="🟩 Positive Weights (Looks for pixel)\n🟥 Negative Weights (Avoids pixel)", 
+                 font=("Arial", 12), justify="left").pack(pady=10)
 
     def save_example(self): # função para guardar o desenho atual como exemplo de treino
         label = self.save_label_var.get() # lê o número escolhido
@@ -305,13 +436,13 @@ class ANNApp: # classe principal que cria a interface gráfica
         # Create popup window
         dash_window = tk.Toplevel(self.root)
         dash_window.title("Algorithm Performance Evaluation")
-        dash_window.geometry("800x220")
+        dash_window.geometry("800x300")
         
         tk.Label(dash_window, text="Algorithm Comparison Matrix", font=("Arial", 14, "bold")).pack(pady=10)
         
         # Create Treeview table widget
         columns = ("metric", "hebb", "perceptron", "adaline")
-        tree = ttk.Treeview(dash_window, columns=columns, show="headings", height=4)
+        tree = ttk.Treeview(dash_window, columns=columns, show="headings", height=7)
         tree.pack(fill="both", expand=True, padx=10, pady=5)
         
         # Define Headings
@@ -337,6 +468,9 @@ class ANNApp: # classe principal que cria a interface gráfica
 
         # Insert rows for the 3 key topics
         tree.insert("", "end", values=("Training Time", fmt(h_stats['time'], " sec"), fmt(p_stats['time'], " sec"), fmt(w_stats['time'], " sec")))
+        tree.insert("", "end", values=("Epochs", fmt(h_stats['epochs'], precision=0), fmt(p_stats['epochs'], precision=0), fmt(w_stats['epochs'], precision=0)))
+        tree.insert("", "end", values=("Iterations", fmt(h_stats['iterations'], precision=0), fmt(p_stats['iterations'], precision=0), fmt(w_stats['iterations'], precision=0)))
+        tree.insert("", "end", values=("Final MSE", fmt(h_stats['mse']), fmt(p_stats['mse']), fmt(w_stats['mse'])))
         tree.insert("", "end", values=("Correct", fmt(h_stats['correct'], precision=0), fmt(p_stats['correct'], precision=0), fmt(w_stats['correct'])))
         tree.insert("", "end", values=("Errors", fmt(h_stats['wrong'], precision=0), fmt(p_stats['wrong'], precision=0), fmt(w_stats['wrong'])))
         tree.insert("", "end", values=("Train Dataset Accuracy", fmt(h_stats['accuracy'], 1), fmt(p_stats['accuracy'], 1), fmt(w_stats['accuracy'], 1)))
