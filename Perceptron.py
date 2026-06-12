@@ -63,7 +63,7 @@ class Perceptron: # classe do algoritmo Perceptron
         self.b = None
         self.lr = lr # guarda o learning rate
 
-    def train(self, X, y_idx, epochs=100): # treina durante 100 épocas (vezes)
+    def train(self, X, y_idx, iterations=100): # treina durante 100 épocas (vezes)
         start_t = time.time()
         total_correct = 0
         total_error = 0
@@ -72,7 +72,7 @@ class Perceptron: # classe do algoritmo Perceptron
         self.W = np.zeros((n_numbers, n_inputs)) # pesos começam a zero
         self.b = np.zeros(n_numbers) # bias começa a zero
         epochs_run = 0
-        for _ in range(epochs): # repete o treino durante o número de épocas definido
+        for _ in range(iterations): # repete o treino durante o número de épocas definido
             epochs_run += 1
             has_error = False # check for early stopping
             for xi, target in zip(X, y_idx): # para cada padrão de treino
