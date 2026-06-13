@@ -196,11 +196,9 @@ class ANNApp: # classe principal que cria a interface gráfica
                      values=["Hebb", "Perceptron", "Adaline"],
                      state="readonly", width=18).pack() # menu dropdown para escolher o algoritmo
         
-        if self.model_var == "Adaline":
-            tk.Label(controls, text="Epochs").pack(anchor="w")
-            self.epochs = tk.StringVar(value="100")
-            tk.Entry(controls, textvariable=self.epochs, width=10).pack()
-    
+        tk.Label(controls, text="Epochs").pack(anchor="w")
+        self.epochs = tk.StringVar(value="100")
+        tk.Entry(controls, textvariable=self.epochs, width=10).pack()
 
         tk.Label(controls, text="Learning Rate").pack(anchor="w") # etiqueta "Learning Rate"
         self.lr_var = tk.StringVar(value="0.2") # valor por defeito do learning rate
