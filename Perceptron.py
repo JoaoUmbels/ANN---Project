@@ -219,11 +219,11 @@ class ANNApp: # classe principal que cria a interface gráfica
 
         tk.Label(controls, text="Algorithm").pack(anchor="w") # etiqueta "Algorithm"
         self.model_var = tk.StringVar(value="Perceptron") # variável que guarda o algoritmo selecionado
-        self.algo_combo = ttk.Combobox(controls, textvariable=self.model_var,
+        self.model_choice_box = ttk.Combobox(controls, textvariable=self.model_var,
                      values=["Hebb", "Perceptron", "Adaline"],
                      state="readonly", width=18)
-        self.algo_combo.pack() # menu dropdown para escolher o algoritmo
-        self.algo_combo.bind("<<ComboboxSelected>>", self.update_ui_visibility)
+        self.model_choice_box.pack() # menu dropdown para escolher o algoritmo
+        self.model_choice_box.bind("<<ComboboxSelected>>", self.update_ui_visibility)
 
         self.hyperparams_frame = tk.Frame(controls)
         self.hyperparams_frame.pack(fill="x")
@@ -264,20 +264,20 @@ class ANNApp: # classe principal que cria a interface gráfica
         self.update_ui_visibility()
 
     def update_ui_visibility(self, event=None):
-        algo = self.model_var.get()
+        model_choice = self.model_var.get()
         
         self.epochs_frame.pack_forget()
         self.lr_frame.pack_forget()
         
-        if algo == "Adaline":
+        if model_choice == "Adaline":
             self.epochs_frame.pack(fill="x")
             self.lr_frame.pack(fill="x")
-            if self.lr_var.get() == "0.2":
-                self.lr_var.set("0.001")
-        elif algo == "Perceptron":
+            self.lr_var.set("0.001")
+                
+        elif model_choice == "Perceptron":
             self.lr_frame.pack(fill="x")
-            if self.lr_var.get() == "0.001":
-                self.lr_var.set("0.2")
+            self.lr_var.set("0.2")
+
 
     def on_click(self, event): # função chamada quando o utilizador clica na grelha
         col = event.x // self.cell_size # calcula em que coluna foi o clique
