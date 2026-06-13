@@ -1,12 +1,11 @@
-import tkinter as tk # importa a biblioteca para criar a janela
-from tkinter import ttk, messagebox # importa componentes da janela (menus, popups)
-import numpy as np # importa numpy para fazer cálculos com arrays
-from Settings import numbers_set # importa os padrões dos números do ficheiro Settings
+import tkinter as tk
+from tkinter import ttk, messagebox
+import numpy as np
+from Settings import numbers_set
 import time
 
-def bipolarize(arr): # função que converte os valores binários (0 e 1) para bipolares (-1 e 1)
-    return np.array(arr) * 2 - 1 # multiplica por 2 e subtrai 1: 0 vira -1, 1 vira 1
-
+def bipolarize(arr):
+    return np.array(arr) * 2 - 1
 
 class Hebb: # classe do algoritmo de Hebb
     def __init__(self): # inicializa os pesos e o bias a None (ainda não treinados)
