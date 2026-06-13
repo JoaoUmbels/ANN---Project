@@ -7,7 +7,6 @@ import time
 def bipolarize(arr):
     return np.array(arr) * 2 - 1
 
-
 class Hebb:
     def __init__(self):
         self.W = None
@@ -50,7 +49,6 @@ class Hebb:
     def predict(self, x):
         outputs = np.dot(self.W, x) + self.b
         return np.argmax(outputs)
-
 
 class Perceptron:
     def __init__(self, lr=0.2):
@@ -104,7 +102,6 @@ class Perceptron:
     def predict(self, x):
         outputs = np.dot(self.W, x) + self.b
         return np.argmax(outputs)
-
 
 class Adaline:
     def __init__(self, lr=0.001):
@@ -162,7 +159,6 @@ class Adaline:
         outputs = np.dot(self.W, x) + self.b
         return np.argmax(outputs)
 
-
 class ANNApp:
     def __init__(self, root):
         self.root = root
@@ -219,7 +215,7 @@ class ANNApp:
 
         self.epochs_frame = tk.Frame(self.hyperparams_frame)
         tk.Label(self.epochs_frame, text="Epochs").pack(anchor="w")
-        self.epochs = tk.StringVar(value="100")
+        self.epochs = tk.StringVar(value="200")
         tk.Entry(self.epochs_frame, textvariable=self.epochs, width=10).pack()
 
         self.lr_frame = tk.Frame(self.hyperparams_frame)
