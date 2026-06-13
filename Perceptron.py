@@ -67,7 +67,7 @@ class Perceptron: # classe do algoritmo Perceptron
         start_t = time.time()
         total_correct = 0
         total_error = 0
-        n_numbers = len(set(y_idx)) # número de classes
+        n_numbers = len(set(y_idx)) # número de outputs
         n_inputs = len(X[0]) # número de inputs (pixels)
         self.W = np.zeros((n_numbers, n_inputs)) # pesos começam a zero
         self.b = np.zeros(n_numbers) # bias começa a zero
