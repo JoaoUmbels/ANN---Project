@@ -4,13 +4,13 @@ import numpy as np
 from Settings import numbers_set
 import time
 
-def bipolarize(arr):
+def bipolarize(arr): # Converts binary (0/1) to bipolar (-1/+1): value * 2 - 1
     return np.array(arr) * 2 - 1
 
-class Hebb:
+class Hebb: 
     def __init__(self):
-        self.W = None
-        self.b = None
+        self.W = None  # Weight matrix  (n_classes × n_inputs)
+        self.b = None  # Bias vector    (n_classes,)
 
     def train(self, X, y_idx):
         start_t = time.time()
@@ -46,11 +46,14 @@ class Hebb:
             "mse": "----"
             }
 
-    def predict(self, x):
+    def predict(self, x): # Returns class with highest net activation: argmax(W·x + b)
         outputs = np.dot(self.W, x) + self.b
         return np.argmax(outputs)
+    
+    
 
-class Perceptron:
+
+class Perceptron: # w(new) = w(old) + α·error·xi,  stops when no errors in a full pass
     def __init__(self, lr=0.2):
         self.W = None
         self.b = None
@@ -78,7 +81,7 @@ class Perceptron:
                         self.b[i] += self.lr * error
                         has_error = True
 
-            if not has_error:
+            if not has_error:  # Converged — no errors in this epoch
                 break
 
         for xi, target in zip(X, y_idx):
@@ -99,7 +102,7 @@ class Perceptron:
             "mse": "----"
             }
     
-    def predict(self, x):
+    def predict(self, x): # Returns class with highest net activation: argmax(W·x + b)
         outputs = np.dot(self.W, x) + self.b
         return np.argmax(outputs)
 
@@ -126,14 +129,14 @@ class Adaline:
             for xi, target in zip(X, y_idx):
                 desired = np.full(n_numbers, -1.0)
                 desired[target] = 1.0
-                net = np.dot(self.W, xi) + self.b
-                error = desired - net
+                net = np.dot(self.W, xi) + self.b   # Linear activation (y_in)
+                error = desired - net                 # Delta: t - y_in
                 epoch_mse += np.sum(error ** 2)
-                W_gradient += np.outer(error, xi)
-                b_gradient += error
-            
+                W_gradient += np.outer(error, xi)    # Accumulate ΔW
+                b_gradient += error                  # Accumulate Δb
+ 
             final_mse = epoch_mse / (len(X) * n_numbers)
-            self.W += self.lr * W_gradient
+            self.W += self.lr * W_gradient           # Batch weight update
             self.b += self.lr * b_gradient
 
         for xi, target in zip(X, y_idx):
@@ -155,7 +158,7 @@ class Adaline:
         "mse": final_mse
         }
 
-    def predict(self, x):
+    def predict(self, x): # Returns class with highest net activation: argmax(W·x + b)
         outputs = np.dot(self.W, x) + self.b
         return np.argmax(outputs)
 
